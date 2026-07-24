@@ -1,8 +1,5 @@
 package com.chat.ai.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,10 +10,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,7 +34,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
     var showModelBottomSheet by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
-    // Auto-scroll ke paling bawah saat ada pesan baru
     LaunchedEffect(viewModel.messages.size) {
         if (viewModel.messages.isNotEmpty()) {
             listState.animateScrollToItem(viewModel.messages.size - 1)
@@ -48,7 +44,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    // Chip Pemilih Model AI di Tengah TopBar
                     Surface(
                         onClick = { showModelBottomSheet = true },
                         shape = RoundedCornerShape(20.dp),
@@ -60,7 +55,7 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Icon(
-                                Icons.Default.AutoAwesome,
+                                Icons.Default.Star,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.primary
@@ -80,7 +75,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
                     }
                 },
                 actions = {
-                    // Tombol Bersihkan Chat
                     if (viewModel.messages.isNotEmpty()) {
                         IconButton(onClick = { viewModel.messages.clear() }) {
                             Icon(
@@ -99,7 +93,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Konten Utama (Jika kosong / Jika ada pesan)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -133,7 +126,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
                 }
             }
 
-            // Input Bar Capsule
             Surface(
                 tonalElevation = 2.dp,
                 shadowElevation = 8.dp,
@@ -186,7 +178,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
         }
     }
 
-    // Modal Bottom Sheet untuk Memilih Model AI
     if (showModelBottomSheet) {
         ModalBottomSheet(onDismissRequest = { showModelBottomSheet = false }) {
             Column(
@@ -220,7 +211,7 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                Icons.Default.AutoAwesome,
+                                Icons.Default.Star,
                                 contentDescription = null,
                                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray
                             )
@@ -237,7 +228,6 @@ fun ChatScreen(viewModel: ChatViewModel, apiKey: String) {
     }
 }
 
-// Halaman Awal saat Chat Masih Kosong
 @Composable
 fun EmptyStateView(onPromptClick: (String) -> Unit) {
     Column(
@@ -248,7 +238,7 @@ fun EmptyStateView(onPromptClick: (String) -> Unit) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            Icons.Default.AutoAwesome,
+            Icons.Default.Star,
             contentDescription = null,
             modifier = Modifier.size(56.dp),
             tint = MaterialTheme.colorScheme.primary
@@ -261,7 +251,6 @@ fun EmptyStateView(onPromptClick: (String) -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Rekomendasi Pertanyaan Cepat
         val suggestions = listOf(
             "Tuliskan ide aplikasi Android unik",
             "Buatkan contoh skrip Python sederhana",
@@ -280,7 +269,6 @@ fun EmptyStateView(onPromptClick: (String) -> Unit) {
     }
 }
 
-// Item Bubble Chat dengan Avatar
 @Composable
 fun ChatBubbleItem(message: Message) {
     val isUser = message.role == "user"
@@ -291,7 +279,6 @@ fun ChatBubbleItem(message: Message) {
         verticalAlignment = Alignment.Top
     ) {
         if (!isUser) {
-            // Avatar Bot
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -300,7 +287,7 @@ fun ChatBubbleItem(message: Message) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    Icons.Default.AutoAwesome,
+                    Icons.Default.Star,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.primary
@@ -330,7 +317,6 @@ fun ChatBubbleItem(message: Message) {
 
         if (isUser) {
             Spacer(modifier = Modifier.width(8.dp))
-            // Avatar User
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -349,7 +335,6 @@ fun ChatBubbleItem(message: Message) {
     }
 }
 
-// Indicator Animasi AI Sedang Mengetik
 @Composable
 fun LoadingBubble() {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -361,7 +346,7 @@ fun LoadingBubble() {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                Icons.Default.AutoAwesome,
+                Icons.Default.Star,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.primary
