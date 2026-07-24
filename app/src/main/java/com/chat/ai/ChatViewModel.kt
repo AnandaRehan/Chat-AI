@@ -4,7 +4,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chat.ai.data.*
+import com.chat.ai.data.AiModel
+import com.chat.ai.data.ChatRequest
+import com.chat.ai.data.ChatSession
+import com.chat.ai.data.FREE_AI_MODELS
+import com.chat.ai.data.GeminiContent
+import com.chat.ai.data.GeminiPart
+import com.chat.ai.data.GeminiRequest
+import com.chat.ai.data.Message
+import com.chat.ai.data.Provider
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,7 +38,7 @@ class ChatViewModel : ViewModel() {
 
     val themeMode = mutableStateOf(ThemeMode.SYSTEM)
 
-    // Channel untuk mengantre request secara berurutan (FIFO Queue)
+    // Channel untuk antrean request (FIFO Queue)
     private val requestChannel = Channel<ChatSession>(Channel.UNLIMITED)
 
     init {
@@ -38,7 +46,6 @@ class ChatViewModel : ViewModel() {
         startQueueProcessor()
     }
 
-    // Worker coroutine yang terus memproses antrean pesan satu per satu
     private fun startQueueProcessor() {
         viewModelScope.launch {
             for (session in requestChannel) {
@@ -77,7 +84,6 @@ class ChatViewModel : ViewModel() {
 
         val activeModel = selectedModel.value
 
-        // Cek API Key berdasarkan Provider
         if (activeModel.provider == Provider.OPEN_ROUTER && openRouterApiKey.value.isBlank()) {
             settingsErrorMessage.value = "⚠️ OpenRouter API Key belum diisi!"
             showSettingsDialog.value = true
@@ -96,11 +102,9 @@ class ChatViewModel : ViewModel() {
             currentSession.title = if (userText.length > 22) userText.take(22) + "..." else userText
         }
 
-        // Tampilkan pesan user di chat secara langsung
         val userMessage = Message(role = "user", content = userText)
         currentSession.messages.add(userMessage)
 
-        // Kirim request ke antrean
         requestChannel.trySend(currentSession)
     }
 
@@ -145,10 +149,8 @@ class ChatViewModel : ViewModel() {
                     ?: "Maaf, tidak ada respon dari Gemini API."
             }
 
-            // Hilangkan animasi loading umum saat respon dari server sudah masuk
             isLoading.value = false
 
-            // Jalankan animasi pengetikan acak (Simulasi Streaming)
             simulateStreamingResponse(session, rawBotReply)
 
         } catch (e: Exception) {
@@ -157,7 +159,6 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    // Efek Streaming / Typing Acak
     private suspend fun simulateStreamingResponse(session: ChatSession, fullText: String) {
         val botMessage = Message(role = "assistant", content = "")
         session.messages.add(botMessage)
@@ -168,17 +169,14 @@ class ChatViewModel : ViewModel() {
         var i = 0
 
         while (i < words.size) {
-            // Jumlah kata acak per ketikan (antara 1 sampai 4 kata)
             val chunkSize = Random.nextInt(1, 5)
             val end = minOf(i + chunkSize, words.size)
 
             val chunk = words.subList(i, end).joinToString(" ")
             currentContent = if (currentContent.isEmpty()) chunk else "$currentContent $chunk"
 
-            // Update isi pesan agar Jetpack Compose me-render ulang balon chat
             session.messages[lastIndex] = botMessage.copy(content = currentContent)
 
-            // Jeda mili detik acak (antara 40ms sampai 160ms) agar nampak alami
             val randomDelay = Random.nextLong(40, 160)
             delay(randomDelay)
 
