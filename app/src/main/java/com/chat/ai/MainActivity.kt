@@ -14,17 +14,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.viewModels
+import com.chat.ai.ui.ChatScreen
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: ChatViewModel by viewModels()
+
+    // Tempelkan OpenRouter API Key kamu di sini
+    private val apiKey = "sk-or-v1-xxxxxxxxxxxxxxxxxxxx" 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AiChatScreen()
+                Surface {
+                    ChatScreen(viewModel = viewModel, apiKey = apiKey)
                 }
             }
         }

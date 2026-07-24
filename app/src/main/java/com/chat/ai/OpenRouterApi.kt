@@ -25,7 +25,7 @@ interface OpenRouterService {
     @POST("chat/completions")
     suspend fun sendChat(
         @Header("Authorization") apiKey: String,
-        @Header("HTTP-Referer") referer: String = "https://github.com/my-android-app",
+        @Header("HTTP-Referer") referer: String = "https://github.com/AnandaRehan/Chat-AI",
         @Body request: ChatRequest
     ): ChatResponse
 }
