@@ -33,6 +33,7 @@ import com.chat.ai.ChatViewModel
 import com.chat.ai.ThemeMode
 import com.chat.ai.data.FREE_AI_MODELS
 import com.chat.ai.data.Message
+import com.chat.ai.data.Provider
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +48,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
     val currentSession = viewModel.getCurrentSession()
     val listState = rememberLazyListState()
 
-    // Auto-scroll ke bawah saat ada pesan baru
     LaunchedEffect(currentSession?.messages?.size) {
         if (!currentSession?.messages.isNullOrEmpty()) {
             listState.animateScrollToItem(currentSession!!.messages.size - 1)
@@ -58,7 +58,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.width(300.dp)) {
-                // Header Sidebar
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -77,7 +76,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Chat AI Pro", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text("Powered by OpenRouter", fontSize = 11.sp, color = Color.Gray)
+                            Text("Multi-Provider Supported", fontSize = 11.sp, color = Color.Gray)
                         }
                     }
 
@@ -146,9 +145,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
-                // Footer Sidebar: Settings
                 NavigationDrawerItem(
-                    label = { Text("Pengaturan", fontWeight = FontWeight.SemiBold) },
+                    label = { Text("Pengaturan API & Tema", fontWeight = FontWeight.SemiBold) },
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                     selected = false,
                     onClick = {
@@ -247,7 +245,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
                         FloatingActionButton(
                             onClick = {
-                                if (inputText.isNotBlank() && !viewModel.isLoading.value) {
+                                if (inputText.isNotBlank()) {
                                     val textToSend = inputText
                                     inputText = ""
                                     viewModel.sendMessage(textToSend)
@@ -287,7 +285,15 @@ fun ChatScreen(viewModel: ChatViewModel) {
                             Icon(Icons.Default.Star, contentDescription = null, tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text(model.name, fontWeight = FontWeight.Bold)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(model.name, fontWeight = FontWeight.Bold)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = if (model.provider == Provider.GEMINI) "[GEMINI]" else "[OPENROUTER]",
+                                        fontSize = 10.sp,
+                                        color = if (model.provider == Provider.GEMINI) MaterialTheme.colorScheme.primary else Color.Gray
+                                    )
+                                }
                                 Text(model.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
@@ -297,17 +303,17 @@ fun ChatScreen(viewModel: ChatViewModel) {
         }
     }
 
-    // Dialog Settings (API Key & Ganti Tema Dark/Light)
+    // Dialog Settings (Dua Input API Key)
     if (viewModel.showSettingsDialog.value) {
-        var tempKey by remember { mutableStateOf(viewModel.apiKey.value) }
+        var tempOpenRouterKey by remember { mutableStateOf(viewModel.openRouterApiKey.value) }
+        var tempGeminiKey by remember { mutableStateOf(viewModel.geminiApiKey.value) }
 
         AlertDialog(
             onDismissRequest = { viewModel.showSettingsDialog.value = false },
             icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-            title = { Text("Pengaturan") },
+            title = { Text("Pengaturan API & Tema") },
             text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    // Tampilkan Peringatan Jika Belum Set API Key
                     if (viewModel.settingsErrorMessage.value != null) {
                         Surface(
                             color = MaterialTheme.colorScheme.errorContainer,
@@ -323,29 +329,44 @@ fun ChatScreen(viewModel: ChatViewModel) {
                         }
                     }
 
-                    // 1. Bagian API Key
+                    // Input Google Gemini API Key
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("OpenRouter API Key", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("Google Gemini API Key", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     OutlinedTextField(
-                        value = tempKey,
-                        onValueChange = { tempKey = it },
+                        value = tempGeminiKey,
+                        onValueChange = { tempGeminiKey = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("AIzaSy...") }
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Input OpenRouter API Key
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("OpenRouter API Key", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    OutlinedTextField(
+                        value = tempOpenRouterKey,
+                        onValueChange = { tempOpenRouterKey = it },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("sk-or-v1-...") }
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. Bagian Pilihan Tema (Dark / Light / System)
-                    Text("Tampilan Tema", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Tampilan Tema", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     val selectedTheme = viewModel.themeMode.value
-                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -370,7 +391,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.apiKey.value = tempKey
+                    viewModel.openRouterApiKey.value = tempOpenRouterKey
+                    viewModel.geminiApiKey.value = tempGeminiKey
                     viewModel.settingsErrorMessage.value = null
                     viewModel.showSettingsDialog.value = false
                 }) { Text("Simpan") }
