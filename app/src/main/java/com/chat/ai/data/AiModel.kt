@@ -15,7 +15,7 @@ val FREE_AI_MODELS = listOf(
     AiModel(
         id = "meta-llama/llama-3.3-70b-instruct:free",
         name = "Llama 3.3 70B",
-        description = "Sangat pintar untuk obrolan umum & diskusi"
+        description = "Sangat pintar untuk obrolan umum"
     ),
     AiModel(
         id = "deepseek/deepseek-r1:free",

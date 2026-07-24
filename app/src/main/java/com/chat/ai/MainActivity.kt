@@ -11,9 +11,7 @@ import com.chat.ai.ui.ChatScreen
 class MainActivity : ComponentActivity() {
 
     private val viewModel: ChatViewModel by viewModels()
-
-    // Masukkan API Key OpenRouter kamu di sini
-    private val apiKey = "sk-or-v1-xxxxxxxxxxxxxxxxxxxx"
+    private val apiKey = "sk-or-v1-xxxxxxxxxxxxxxxxxxxx" // Masukkan API Key OpenRouter kamu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

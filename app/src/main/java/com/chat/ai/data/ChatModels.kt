@@ -1,3 +1,4 @@
+package com.chat.ai.data
 
 data class ChatRequest(
     val model: String,
