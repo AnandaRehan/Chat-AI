@@ -11,10 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -122,7 +122,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                                     fontSize = 14.sp
                                 )
                             },
-                            icon = { Icon(Icons.Default.ChatBubbleOutline, contentDescription = null) },
+                            icon = { Icon(Icons.Default.Edit, contentDescription = null) },
                             selected = isSelected,
                             onClick = {
                                 viewModel.selectSession(session.id)
@@ -325,7 +325,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
                     // 1. Bagian API Key
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Key, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("OpenRouter API Key", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
